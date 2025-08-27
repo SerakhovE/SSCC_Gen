@@ -39,7 +39,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             if (messageText.equals("/start")) {
                 SendMessage message = new SendMessage();
                 message.setChatId(chatId);
-                message.setText("Привет! Введите АДРЕС ЯЧЕЙКИ в формате 0000-00-00 (например: 2024-15-01)");
+                message.setText("Привет! Введите АДРЕС ЯЧЕЙКИ в формате 0000-00-00 (например: 2024-15-01) \nИ я сгенерирую Штрихкод!");
                 try {
                     execute(message);
                 } catch (TelegramApiException e) {
@@ -157,4 +157,5 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         return result.toString().toUpperCase();
     }
+
 }
