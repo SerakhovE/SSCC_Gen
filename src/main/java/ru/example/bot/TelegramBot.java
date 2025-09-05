@@ -93,7 +93,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (originalText.contains("-")) {
             photo.setCaption("✅   S" + originalText + "   ✅"); // Только то, что ввел пользователь
         } else if (originalText.contains(" ")) {
-            photo.setCaption("✅   S" + originalText.substring(0, 4) + "-" + originalText.substring(4, 6) + "-" + originalText.substring(6, 8) + "   ✅");
+            photo.setCaption("✅   S" + originalText.replace(" ", "-") + "   ✅");
         } else {
             photo.setCaption("✅   S" + originalText.substring(0, 4) + "-" + originalText.substring(4, 6) + "-0" + originalText.charAt(6) + "   ✅");
         }
@@ -193,4 +193,5 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
 }
+
 
