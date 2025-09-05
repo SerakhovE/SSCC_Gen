@@ -39,7 +39,9 @@ public class TelegramBot extends TelegramLongPollingBot {
             if (messageText.equals("/start")) {
                 SendMessage message = new SendMessage();
                 message.setChatId(chatId);
-                message.setText("Привет! Введите АДРЕС ЯЧЕЙКИ в формате 0000-00-00 (например: 2024-15-01) \nИ я сгенерирую Штрихкод!");
+                message.setText("Привет! Введите АДРЕС ЯЧЕЙКИ в формате 0000-00-00 (например: 2024-15-01)" +
+                        "\nили в формате 0000 00 00 (например: 2024 15 01)" +
+                        "\nили в формате 1111223 (например: 2024151) \nИ я сгенерирую Штрихкод!");
                 try {
                     execute(message);
                 } catch (TelegramApiException e) {
@@ -69,7 +71,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             else {
                 SendMessage message = new SendMessage();
                 message.setChatId(chatId);
-                message.setText("❌ Неверный формат! (пример: 3009-07-03)");
+                message.setText("❌ Неверный формат! (пример: 3009-07-03 или 3009 07 03 или 3009073)");
                 try {
                     execute(message);
                 } catch (TelegramApiException e) {
@@ -88,7 +90,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         SendPhoto photo = new SendPhoto();
         photo.setChatId(String.valueOf(chatId));
         photo.setPhoto(new InputFile(new ByteArrayInputStream(barcodeImage), "barcode.png"));
-        photo.setCaption("✅   S" + originalText + "   ✅"); // Только то, что ввел пользователь
+        if (originalText.contains("-")) {
+            photo.setCaption("✅   S" + originalText + "   ✅"); // Только то, что ввел пользователь
+        } else if (originalText.contains(" ")) {
+            photo.setCaption("✅   S" + originalText.substring(0, 4) + "-" + originalText.substring(4, 6) + "-" + originalText.substring(6, 8) + "   ✅");
+        } else {
+            photo.setCaption("✅   S" + originalText.substring(0, 4) + "-" + originalText.substring(4, 6) + "-0" + originalText.charAt(6) + "   ✅");
+        }
 
         // Отправляем изображение
         execute(photo);
@@ -123,16 +131,42 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     // Метод для проверки формата
     private boolean isValidDateFormat(String date) {
-        String regex = "^\\d{4}-\\d{2}-\\d{2}$";
-        return date.matches(regex);
+        String regex1 = "^\\d{4}-\\d{2}-\\d{2}$";
+        String regex2 = "^\\d{7}$";
+        String regex3 = "^\\d{4} \\d{2} \\d{2}$";
+        if (date.matches(regex1)) {
+            return true;
+        } else if (date.matches(regex3)) {
+            return true;
+        }
+        return date.matches(regex2);
     }
 
     // Метод для обработки данных
     private String processDate(String date) {
-        String[] parts = date.split("-");
-        int row = Integer.parseInt(parts[0]);
-        int cell = Integer.parseInt(parts[1]);
-        int stage = Integer.parseInt(parts[2]);
+        String[] parts;
+        int row;
+        int cell;
+        int stage;
+        if (date.contains("-")) {
+            parts = date.split("-");
+            row = Integer.parseInt(parts[0]);
+            cell = Integer.parseInt(parts[1]);
+            stage = Integer.parseInt(parts[2]);
+        } else if (date.contains(" ")) {
+            parts = date.split(" ");
+            row = Integer.parseInt(parts[0]);
+            cell = Integer.parseInt(parts[1]);
+            stage = Integer.parseInt(parts[2]);
+        } else {
+            parts = new String[3];
+            parts[0] = date.substring(0, 4); // первые 4 символа
+            parts[1] = date.substring(4, 6); // следующие 2 символа  
+            parts[2] = date.substring(6);    // последний символ
+            row = Integer.parseInt(parts[0]);
+            cell = Integer.parseInt(parts[1]);
+            stage = Integer.parseInt(parts[2]);
+        }
 
         StringBuilder result = new StringBuilder("92");
 
@@ -159,3 +193,4 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
 }
+
