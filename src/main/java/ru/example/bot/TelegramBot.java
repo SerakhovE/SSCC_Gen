@@ -186,12 +186,14 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         // Добавляем остальные части
         result.append("1");
-        result.append(stage);
+        String hexStage = Integer.toHexString(stage);
+        result.append(hexStage);
         result.append("WRH");
 
         return result.toString().toUpperCase();
     }
 
 }
+
 
 
