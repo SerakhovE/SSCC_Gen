@@ -1,4 +1,15 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk-alpine
+
 WORKDIR /app
-COPY target/*.jar app.jar
-CMD ["java", "-jar", "app.jar"]
+
+# Копируем всё содержимое проекта
+COPY . .
+
+# Даем права на выполнение gradlew
+RUN chmod +x gradlew
+
+# Компилируем проект
+RUN ./gradlew build -x test
+
+# Запускаем приложение
+CMD ["java", "-jar", "build/libs/SSCC_Gen-1.0-SNAPSHOT.jar"]
