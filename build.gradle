@@ -16,7 +16,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'ru.example.bot.TelegramBot'
+    mainClass = 'ru.example.Main'  // или 'ru.example.bot.TelegramBot'
 }
 
 jar {
