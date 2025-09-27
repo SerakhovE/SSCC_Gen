@@ -16,18 +16,24 @@ dependencies {
 }
 
 application {
-    mainClass = 'ru.example.Main'  // или 'ru.example.bot.TelegramBot'
+    mainClass = 'ru.example.Main'
 }
 
+// ФАТ JAR который включает все зависимости
 jar {
-    archiveBaseName = "SSCC_Gen"
-    archiveVersion = "1.0-SNAPSHOT"
-    archiveFileName = "SSCC_Gen.jar"
     manifest {
-        attributes 'Main-Class': 'ru.example.bot.TelegramBot'
+        attributes 'Main-Class': 'ru.example.Main'
     }
+    
     from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath.collect { 
+            it.isDirectory() ? it : zipTree(it) 
+        }
     }
+    
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.named('jar') {
+    archiveFileName = 'SSCC_Gen.jar'
 }
