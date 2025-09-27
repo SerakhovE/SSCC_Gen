@@ -20,6 +20,9 @@ application {
 }
 
 jar {
+    archiveBaseName = "SSCC_Gen"
+    archiveVersion = "1.0-SNAPSHOT"
+    archiveFileName = "SSCC_Gen.jar"
     manifest {
         attributes 'Main-Class': 'ru.example.bot.TelegramBot'
     }
