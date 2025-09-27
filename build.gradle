@@ -3,7 +3,7 @@ plugins {
     id 'application'
 }
 
-group = 'com.example'
+group = 'ru.example'
 version = '1.0-SNAPSHOT'
 
 repositories {
@@ -12,15 +12,16 @@ repositories {
 
 dependencies {
     implementation 'org.telegram:telegrambots:6.9.7.1'
+    implementation 'net.sf.barcode4j:barcode4j:2.1'
 }
 
 application {
-    mainClass = 'com.example.ssccgen.TelegramBot'
+    mainClass = 'ru.example.bot.TelegramBot'
 }
 
 jar {
     manifest {
-        attributes 'Main-Class': 'com.example.ssccgen.TelegramBot'
+        attributes 'Main-Class': 'ru.example.bot.TelegramBot'
     }
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
