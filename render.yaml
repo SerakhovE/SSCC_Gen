@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: sscc-bot
+    env: docker
+    docker:
+      dockerfile: Dockerfile
