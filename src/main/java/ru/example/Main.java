@@ -288,21 +288,61 @@ public class Main {
                                     radioCell.addEventListener('change', updateInputField);
                                     radioSscc.addEventListener('change', updateInputField);
                             
-                                    // Автоматическое добавление тире для режима ЯЧЕЙКА
-                                    inputText.addEventListener('input', function(e) {
-                                        if (!radioCell.checked) return;
+                                    // УНИВЕРСАЛЬНАЯ ВАЛИДАЦИЯ ДЛЯ ВСЕХ УСТРОЙСТВ
+                                    function validateInput() {
+                                        let value = inputText.value;
                             
-                                        let value = this.value.replace(/-/g, '');
-                                        if (value.length > 8) value = value.substring(0, 8);
+                                        if (radioCell.checked) {
+                                            // Режим ЯЧЕЙКА - только цифры и тире
+                                            value = value.replace(/[^\\d-]/g, '');
                             
-                                        let formattedValue = '';
-                                        for (let i = 0; i < value.length; i++) {
-                                            if (i === 4 || i === 6) formattedValue += '-';
-                                            formattedValue += value[i];
+                                            // Убираем лишние тире и форматируем
+                                            let digits = value.replace(/-/g, '');
+                                            if (digits.length > 8) digits = digits.substring(0, 8);
+                            
+                                            let formattedValue = '';
+                                            for (let i = 0; i < digits.length; i++) {
+                                                if (i === 4 || i === 6) formattedValue += '-';
+                                                formattedValue += digits[i];
+                                            }
+                                            inputText.value = formattedValue;
+                            
+                                        } else {
+                                            // Режим SSCC - только цифры, максимум 7
+                                            value = value.replace(/\\D/g, '');
+                                            if (value.length > 7) value = value.substring(0, 7);
+                                            inputText.value = value;
                                         }
+                                    }
                             
-                                        if (this.value !== formattedValue) {
-                                            this.value = formattedValue;
+                                    // Обработчики для всех событий ввода
+                                    inputText.addEventListener('input', validateInput);
+                                    inputText.addEventListener('keydown', function(e) {
+                                        // Блокируем нецифровые клавиши (кроме управляющих)
+                                        if (!radioCell.checked && !/\\d|Backspace|Delete|Arrow|Tab|Enter/.test(e.key)) {
+                                            e.preventDefault();
+                                        }
+                                    });
+                            
+                                    // Обработчик вставки
+                                    inputText.addEventListener('paste', function(e) {
+                                        e.preventDefault();
+                                        let pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                            
+                                        if (radioCell.checked) {
+                                            let digits = pastedText.replace(/\\D/g, '');
+                                            if (digits.length > 8) digits = digits.substring(0, 8);
+                            
+                                            let formattedValue = '';
+                                            for (let i = 0; i < digits.length; i++) {
+                                                if (i === 4 || i === 6) formattedValue += '-';
+                                                formattedValue += digits[i];
+                                            }
+                                            inputText.value = formattedValue;
+                                        } else {
+                                            let digits = pastedText.replace(/\\D/g, '');
+                                            if (digits.length > 7) digits = digits.substring(0, 7);
+                                            inputText.value = digits;
                                         }
                                     });
                             
@@ -345,31 +385,38 @@ public class Main {
                                         try {
                                             clearBarcode();
                             
-                                            const input = inputText.value.trim();
+                                            let input = inputText.value.trim();
                             
                                             if (radioCell.checked) {
-                                                const cleanText = input.replace(/-/g, '');
+                                                let cleanText = input.replace(/-/g, '');
                                                 if (cleanText.length === 8) {
-                                                    const formattedText = cleanText.substring(0, 4) + '-' + 
-                                                                         cleanText.substring(4, 6) + '-' + 
-                                                                         cleanText.substring(6, 8);
+                                                    // Дополнительная проверка что все символы цифры
+                                                    if (/^\\d{8}$/.test(cleanText)) {
+                                                        const formattedText = cleanText.substring(0, 4) + '-' +\s
+                                                                             cleanText.substring(4, 6) + '-' +\s
+                                                                             cleanText.substring(6, 8);
                             
-                                                    if (isValidDateFormat(formattedText)) {
-                                                        const result = processDate(formattedText);
-                                                        generateBarcodeImage(result);
+                                                        if (isValidDateFormat(formattedText)) {
+                                                            const result = processDate(formattedText);
+                                                            generateBarcodeImage(result);
+                                                        } else {
+                                                            showError('Неверный формат даты! Пример: 2024-15-01');
+                                                        }
                                                     } else {
-                                                        showError('Неверный формат! Пример: 2024-15-01');
+                                                        showError('Только цифры разрешены!');
                                                     }
                                                 } else {
-                                                    showError('Введите все 8 цифр: 1111-22-33');
+                                                    showError('Нужно 8 цифр! Формат: 1111-22-33');
                                                 }
                                             } else {
-                                                const cleanText = input.replace(/\\D/g, '');
-                                                if (cleanText.length === 7) {
+                                                // Для SSCC берем только первые 7 цифр на всякий случай
+                                                let cleanText = input.replace(/\\D/g, '');
+                                                if (cleanText.length >= 7) {
+                                                    cleanText = cleanText.substring(0, 7);
                                                     const result = processSscc(cleanText);
                                                     generateBarcodeImage(result);
                                                 } else {
-                                                    showError('Неверный формат! Введите ровно 7 цифр');
+                                                    showError('Нужно 7 цифр!');
                                                 }
                                             }
                                         } catch (error) {
@@ -393,7 +440,7 @@ public class Main {
                                             barcodeCanvas.width = 300;
                                             barcodeCanvas.height = 150;
                             
-                                            // Генерируем штрихкод с простыми настройками
+                                            // Генерируем штрихкод с простыми настройки
                                             JsBarcode(barcodeCanvas, data, {
                                                 format: "CODE128",
                                                 width: 2,
@@ -433,84 +480,6 @@ public class Main {
                                     setTimeout(() => {
                                         console.log('App initialized, testing barcode generation...');
                                     }, 1000);
-                                    // Разрешаем ввод только цифр и тире
-                                            function validateInput(e) {
-                                                const key = e.key;
-                                                const isDigit = /^\\d$/.test(key);
-                                                const isDash = key === '-';
-                                                const isBackspace = key === 'Backspace';
-                                                const isDelete = key === 'Delete';
-                                                const isArrow = key.startsWith('Arrow');
-                                                const isTab = key === 'Tab';
-                            
-                                                // Разрешаем только цифры, тире и управляющие клавиши
-                                                if (!isDigit && !isDash && !isBackspace && !isDelete && !isArrow && !isTab) {
-                                                    e.preventDefault();
-                                                    return;
-                                                }
-                            
-                                                // Для режима ЯЧЕЙКА - автоматическое добавление тире
-                                                if (radioCell.checked && isDigit) {
-                                                    setTimeout(() => {
-                                                        let value = inputText.value.replace(/-/g, '');
-                                                        if (value.length > 8) value = value.substring(0, 8);
-                            
-                                                        let formattedValue = '';
-                                                        for (let i = 0; i < value.length; i++) {
-                                                            if (i === 4 || i === 6) formattedValue += '-';
-                                                            formattedValue += value[i];
-                                                        }
-                            
-                                                        if (inputText.value !== formattedValue) {
-                                                            inputText.value = formattedValue;
-                                                        }
-                                                    }, 0);
-                                                }
-                                            }
-                            
-                                            // Обработчик вставки (paste) - очищаем от нецифровых символов
-                                            function handlePaste(e) {
-                                                e.preventDefault();
-                                                let pastedText = (e.clipboardData || window.clipboardData).getData('text');
-                            
-                                                // Оставляем только цифры
-                                                pastedText = pastedText.replace(/\\D/g, '');
-                            
-                                                if (radioCell.checked) {
-                                                    // Для режима ЯЧЕЙКА форматируем как дату
-                                                    if (pastedText.length > 8) pastedText = pastedText.substring(0, 8);
-                                                    let formattedValue = '';
-                                                    for (let i = 0; i < pastedText.length; i++) {
-                                                        if (i === 4 || i === 6) formattedValue += '-';
-                                                        formattedValue += pastedText[i];
-                                                    }
-                                                    inputText.value = formattedValue;
-                                                } else {
-                                                    // Для режима SSCC - только цифры
-                                                    if (pastedText.length > 7) pastedText = pastedText.substring(0, 7);
-                                                    inputText.value = pastedText;
-                                                }
-                                            }
-                            
-                                            // Добавь обработчики после существующего кода
-                                            inputText.addEventListener('keydown', validateInput);
-                                            inputText.addEventListener('paste', handlePaste);
-                            
-                                            // Также обнови функцию updateInputField для сброса значения
-                                            function updateInputField() {
-                                                if (radioCell.checked) {
-                                                    inputText.placeholder = 'Формат: 0000-00-00';
-                                                    inputText.maxLength = 10;
-                                                } else {
-                                                    inputText.placeholder = 'Последние 7 цифр';
-                                                    inputText.maxLength = 7;
-                                                }
-                                                inputText.value = '';
-                                                inputText.focus();
-                            
-                                                // Очищаем предыдущий результат
-                                                clearBarcode();
-                                            }
                                 </script>
                             </body>
                             </html>
