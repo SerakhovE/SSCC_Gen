@@ -372,7 +372,7 @@ public class Main {
                             
                                     // Обработка SSCC
                                     function processSscc(input) {
-                                        return "0000300002300" + input;
+                                        return "0000300002301" + input;
                                     }
                             
                                     // Проверка формата даты
