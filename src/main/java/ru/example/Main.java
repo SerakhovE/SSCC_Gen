@@ -372,7 +372,11 @@ public class Main {
                             
                                     // Обработка SSCC
                                     function processSscc(input) {
-                                        return "0000300002301" + input;
+                                        if (input.startsWith('9')) {
+                                            return "0000300002300" + input;
+                                        } else {
+                                            return "0000300002301" + input;
+                                        }
                                     }
                             
                                     // Проверка формата даты
