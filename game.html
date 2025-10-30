@@ -600,19 +600,34 @@
             // Настройка управления для мобильных устройств
             function setupTouchControls() {
                 let startX, startY;
+                let touchMoved = false;
                 
                 gridContainer.addEventListener('touchstart', (e) => {
                     startX = e.touches[0].clientX;
                     startY = e.touches[0].clientY;
+                    touchMoved = false;
                     e.preventDefault();
                 }, { passive: false });
                 
                 gridContainer.addEventListener('touchmove', (e) => {
+                    if (!startX || !startY) return;
+                    
+                    const currentX = e.touches[0].clientX;
+                    const currentY = e.touches[0].clientY;
+                    
+                    const diffX = currentX - startX;
+                    const diffY = currentY - startY;
+                    
+                    // Если движение достаточно большое, отмечаем что был свайп
+                    if (Math.abs(diffX) > 10 || Math.abs(diffY) > 10) {
+                        touchMoved = true;
+                    }
+                    
                     e.preventDefault();
                 }, { passive: false });
                 
                 gridContainer.addEventListener('touchend', (e) => {
-                    if (!startX || !startY || gameOver) return;
+                    if (!startX || !startY || !touchMoved || gameOver) return;
                     
                     const endX = e.changedTouches[0].clientX;
                     const endY = e.changedTouches[0].clientY;
@@ -623,36 +638,38 @@
                     // Минимальное расстояние для свайпа
                     const minSwipeDistance = 30;
                     
+                    let moved = false;
+                    
                     if (Math.abs(diffX) > Math.abs(diffY)) {
                         // Горизонтальный свайп
                         if (Math.abs(diffX) > minSwipeDistance) {
                             if (diffX > 0) {
-                                moveRight();
+                                moved = moveRight();
                             } else {
-                                moveLeft();
+                                moved = moveLeft();
                             }
-                            
-                            addRandomTile();
-                            updateDisplay();
-                            checkGameStatus();
                         }
                     } else {
                         // Вертикальный свайп
                         if (Math.abs(diffY) > minSwipeDistance) {
                             if (diffY > 0) {
-                                moveDown();
+                                moved = moveDown();
                             } else {
-                                moveUp();
+                                moved = moveUp();
                             }
-                            
-                            addRandomTile();
-                            updateDisplay();
-                            checkGameStatus();
                         }
+                    }
+                    
+                    // Добавляем новую пличку ТОЛЬКО если было движение
+                    if (moved) {
+                        addRandomTile();
+                        updateDisplay();
+                        checkGameStatus();
                     }
                     
                     startX = null;
                     startY = null;
+                    touchMoved = false;
                 });
             }
             
