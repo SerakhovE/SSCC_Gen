@@ -10,6 +10,9 @@ import ru.example.bot.TelegramBot;
 import java.net.InetSocketAddress;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
 
 public class Main {
     public static void main(String[] args) {
@@ -21,6 +24,31 @@ public class Main {
 
             // HTTP сервер для веб-интерфейса
             HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+
+            // Обработчик для игры
+            server.createContext("/game", new HttpHandler() {
+                @Override
+                public void handle(HttpExchange exchange) throws IOException {
+                    try {
+                        // Читаем HTML файл игры
+                        Path gamePath = Path.of("game.html");
+                        String gameHtml = Files.readString(gamePath, StandardCharsets.UTF_8);
+                        
+                        exchange.getResponseHeaders().set("Content-Type", "text/html; charset=utf-8");
+                        exchange.sendResponseHeaders(200, gameHtml.getBytes().length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(gameHtml.getBytes());
+                        }
+                    } catch (Exception e) {
+                        // Если файл не найден, отдаем 404
+                        String response = "Игра временно недоступна";
+                        exchange.sendResponseHeaders(404, response.getBytes().length);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(response.getBytes());
+                        }
+                    }
+                }
+            });
 
             // Главная страница с твоим HTML
             server.createContext("/", new HttpHandler() {
@@ -68,12 +96,37 @@ public class Main {
                                         text-align: center;
                                         margin-top: 18px;
                                         margin-bottom: 20px;
+                                        width: 100%;
+                                    }
+                            
+                                    .header-content {
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        width: 100%;
                                     }
                             
                                     .header h1 {
                                         color: #2C3E50;
                                         font-size: 20px;
                                         font-weight: bold;
+                                    }
+                            
+                                    .game-button {
+                                        background: #27ae60;
+                                        color: white;
+                                        padding: 10px 16px;
+                                        border-radius: 8px;
+                                        text-decoration: none;
+                                        font-weight: bold;
+                                        font-size: 14px;
+                                        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                                        transition: background 0.3s;
+                                        white-space: nowrap;
+                                    }
+                            
+                                    .game-button:hover {
+                                        background: #219652;
                                     }
                             
                                     .card {
@@ -203,7 +256,10 @@ public class Main {
                             <body>
                                 <div class="container">
                                     <div class="header">
-                                        <h1>SSCC Cell Gen</h1>
+                                        <div class="header-content">
+                                            <h1>SSCC Cell Gen</h1>
+                                            <a href="/game" class="game-button">🎮 Играть</a>
+                                        </div>
                                     </div>
                             
                                     <div class="card">
@@ -499,6 +555,7 @@ public class Main {
 
             server.start();
             System.out.println("✅ Бот запущен! Веб-интерфейс: https://sscc-gen.onrender.com");
+            System.out.println("✅ Игра доступна по адресу: https://sscc-gen.onrender.com/game");
 
         } catch (Exception e) {
             e.printStackTrace();
