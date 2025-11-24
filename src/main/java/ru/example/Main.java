@@ -272,6 +272,10 @@ public class Main {
                                                 <input type="radio" id="radioSscc" name="barcodeType">
                                                 <label for="radioSscc">SSCC</label>
                                             </div>
+                                            <div class="radio-option">
+                                                <input type="radio" id="radioCustom" name="barcodeType">
+                                                <label for="radioCustom">ШК</label>
+                                            </div>
                                         </div>
                                     </div>
                             
@@ -304,6 +308,7 @@ public class Main {
                                     const errorMessage = document.getElementById('errorMessage');
                                     const radioCell = document.getElementById('radioCell');
                                     const radioSscc = document.getElementById('radioSscc');
+                                    const radioCustom = document.getElementById('radioCustom');
                             
                                     // Убедимся что Canvas поддерживается
                                     function isCanvasSupported() {
@@ -321,9 +326,12 @@ public class Main {
                                         if (radioCell.checked) {
                                             inputText.placeholder = 'Формат: 0000-00-00';
                                             inputText.maxLength = 10;
-                                        } else {
+                                        } else if (radioSscc.checked) {
                                             inputText.placeholder = 'Последние 7 цифр';
                                             inputText.maxLength = 7;
+                                        } else if (radioCustom.checked) {
+                                            inputText.placeholder = 'Любые цифры';
+                                            inputText.maxLength = 50; // Увеличил лимит для произвольных ШК
                                         }
                                         inputText.value = '';
                                         inputText.focus();
@@ -343,6 +351,7 @@ public class Main {
                                     // Обработчики переключения радио-кнопок
                                     radioCell.addEventListener('change', updateInputField);
                                     radioSscc.addEventListener('change', updateInputField);
+                                    radioCustom.addEventListener('change', updateInputField);
                             
                                     // УНИВЕРСАЛЬНАЯ ВАЛИДАЦИЯ ДЛЯ ВСЕХ УСТРОЙСТВ
                                     function validateInput() {
@@ -363,10 +372,14 @@ public class Main {
                                             }
                                             inputText.value = formattedValue;
                             
-                                        } else {
+                                        } else if (radioSscc.checked) {
                                             // Режим SSCC - только цифры, максимум 7
                                             value = value.replace(/\\D/g, '');
                                             if (value.length > 7) value = value.substring(0, 7);
+                                            inputText.value = value;
+                                        } else if (radioCustom.checked) {
+                                            // Режим ШК - только цифры, без ограничения длины (в пределах maxLength)
+                                            value = value.replace(/\\D/g, '');
                                             inputText.value = value;
                                         }
                                     }
@@ -374,8 +387,8 @@ public class Main {
                                     // Обработчики для всех событий ввода
                                     inputText.addEventListener('input', validateInput);
                                     inputText.addEventListener('keydown', function(e) {
-                                        // Блокируем нецифровые клавиши (кроме управляющих)
-                                        if (!radioCell.checked && !/\\d|Backspace|Delete|Arrow|Tab|Enter/.test(e.key)) {
+                                        // Блокируем нецифровые клавиши (кроме управляющих) для SSCC и ШК
+                                        if ((radioSscc.checked || radioCustom.checked) && !/\\d|Backspace|Delete|Arrow|Tab|Enter/.test(e.key)) {
                                             e.preventDefault();
                                         }
                                     });
@@ -395,9 +408,13 @@ public class Main {
                                                 formattedValue += digits[i];
                                             }
                                             inputText.value = formattedValue;
-                                        } else {
+                                        } else if (radioSscc.checked) {
                                             let digits = pastedText.replace(/\\D/g, '');
                                             if (digits.length > 7) digits = digits.substring(0, 7);
+                                            inputText.value = digits;
+                                        } else if (radioCustom.checked) {
+                                            let digits = pastedText.replace(/\\D/g, '');
+                                            if (digits.length > 50) digits = digits.substring(0, 50);
                                             inputText.value = digits;
                                         }
                                     });
@@ -468,7 +485,7 @@ public class Main {
                                                 } else {
                                                     showError('Нужно 8 цифр! Формат: 1111-22-33');
                                                 }
-                                            } else {
+                                            } else if (radioSscc.checked) {
                                                 // Для SSCC берем только первые 7 цифр на всякий случай
                                                 let cleanText = input.replace(/\\D/g, '');
                                                 if (cleanText.length >= 7) {
@@ -477,6 +494,14 @@ public class Main {
                                                     generateBarcodeImage(result);
                                                 } else {
                                                     showError('Нужно 7 цифр!');
+                                                }
+                                            } else if (radioCustom.checked) {
+                                                // Для ШК - любые цифры
+                                                let cleanText = input.replace(/\\D/g, '');
+                                                if (cleanText.length > 0) {
+                                                    generateBarcodeImage(cleanText);
+                                                } else {
+                                                    showError('Введите хотя бы одну цифру!');
                                                 }
                                             }
                                         } catch (error) {
