@@ -446,7 +446,7 @@ public class Main {
                                     // Обработка SSCC
                                     function processSscc(input) {
                                         if (input.startsWith('9')) {
-                                            return "0000300002301" + input;
+                                            return "0000300002302" + input;
                                         } else {
                                             return "0000300002302" + input;
                                         }
