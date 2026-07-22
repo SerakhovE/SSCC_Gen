@@ -170,8 +170,18 @@ public class Main {
                                         border-color: #3498DB;
                                     }
                             
-                                    .input-card {
+                                    .input-row {
+                                        display: flex;
+                                        align-items: stretch;
+                                        gap: 10px;
+                                        width: 100%;
+                                    }
+
+                                    .input-row .input-card {
+                                        flex: 1;
+                                        width: auto;
                                         padding: 16px;
+                                        margin-bottom: 0;
                                     }
                             
                                     #inputText {
@@ -190,8 +200,7 @@ public class Main {
                                     }
                             
                                     #generateButton {
-                                        width: 160px;
-                                        height: 55px;
+                                        width: 110px;
                                         background: #3498DB;
                                         color: white;
                                         border: none;
@@ -279,11 +288,12 @@ public class Main {
                                         </div>
                                     </div>
                             
-                                    <div class="card input-card">
-                                        <input type="text" id="inputText" inputmode="numeric" pattern="[0-9]*" placeholder="Формат: 0000-00-00" maxlength="10">
+                                    <div class="input-row">
+                                        <div class="card input-card">
+                                            <input type="text" id="inputText" inputmode="numeric" pattern="[0-9]*" placeholder="Формат: 0000-00-00" maxlength="10">
+                                        </div>
+                                        <button id="generateButton">Сгенерировать</button>
                                     </div>
-                            
-                                    <button id="generateButton">Сгенерировать</button>
                             
                                     <div class="card barcode-card">
                                         <div id="barcodeContainer">
