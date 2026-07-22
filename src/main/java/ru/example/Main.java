@@ -95,7 +95,6 @@ public class Main {
                                         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                                         text-align: center;
                                         margin-top: 18px;
-                                        margin-bottom: 20px;
                                         width: 100%;
                                     }
                             
@@ -204,10 +203,10 @@ public class Main {
                                         background: #3498DB;
                                         color: white;
                                         border: none;
-                                        border-radius: 8px;
+                                        border-radius: 16px;
                                         font-size: 16px;
                                         cursor: pointer;
-                                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                                        box-shadow: 0 10px 6px rgba(0,0,0,0.1);
                                         transition: background 0.3s;
                                     }
                             
@@ -292,7 +291,7 @@ public class Main {
                                         <div class="card input-card">
                                             <input type="text" id="inputText" inputmode="numeric" pattern="[0-9]*" placeholder="Формат: 0000-00-00" maxlength="10">
                                         </div>
-                                        <button id="generateButton">Сгенерировать</button>
+                                        <button id="generateButton">Создать</button>
                                     </div>
                             
                                     <div class="card barcode-card">
