@@ -1,8 +1,8 @@
 {
   "name": "SSCC Cell Gen",
   "short_name": "SSCC Gen",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#DEDEDE",
   "theme_color": "#3498DB",
