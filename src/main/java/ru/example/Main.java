@@ -289,7 +289,7 @@ public class Main {
                             
                                     <div class="input-row">
                                         <div class="card input-card">
-                                            <input type="text" id="inputText" inputmode="numeric" pattern="[0-9]*" placeholder="Формат: 0000-00-00" maxlength="10">
+                                            <input type="text" id="inputText" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Формат: 0000-00-00" maxlength="10">
                                         </div>
                                         <button id="generateButton">Создать</button>
                                     </div>
