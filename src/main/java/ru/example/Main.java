@@ -327,8 +327,8 @@ public class Main {
                                             inputText.placeholder = 'Формат: 0000-00-00';
                                             inputText.maxLength = 10;
                                         } else if (radioSscc.checked) {
-                                            inputText.placeholder = 'Последние 7 цифр';
-                                            inputText.maxLength = 7;
+                                            inputText.placeholder = 'Последние 8 цифр'; // было 7
+                                            inputText.maxLength = 8; // было 7
                                         } else if (radioCustom.checked) {
                                             inputText.placeholder = 'Любые цифры';
                                             inputText.maxLength = 50; // Увеличил лимит для произвольных ШК
@@ -373,9 +373,9 @@ public class Main {
                                             inputText.value = formattedValue;
                             
                                         } else if (radioSscc.checked) {
-                                            // Режим SSCC - только цифры, максимум 7
+                                            // Режим SSCC - только цифры, максимум 8
                                             value = value.replace(/\\D/g, '');
-                                            if (value.length > 7) value = value.substring(0, 7);
+                                            if (value.length > 8) value = value.substring(0, 8);
                                             inputText.value = value;
                                         } else if (radioCustom.checked) {
                                             // Режим ШК - только цифры, без ограничения длины (в пределах maxLength)
@@ -410,7 +410,7 @@ public class Main {
                                             inputText.value = formattedValue;
                                         } else if (radioSscc.checked) {
                                             let digits = pastedText.replace(/\\D/g, '');
-                                            if (digits.length > 7) digits = digits.substring(0, 7);
+                                            if (digits.length > 8) digits = digits.substring(0, 8);
                                             inputText.value = digits;
                                         } else if (radioCustom.checked) {
                                             let digits = pastedText.replace(/\\D/g, '');
@@ -445,11 +445,9 @@ public class Main {
                             
                                     // Обработка SSCC
                                     function processSscc(input) {
-                                        if (input.startsWith('9')) {
-                                            return "0000300002302" + input;
-                                        } else {
-                                            return "0000300002302" + input;
-                                        }
+                                        // input теперь 8 цифр: первая цифра — та самая "меняющаяся" (2/3/...),
+                                        // остальные 7 — как раньше
+                                    return "000030000230" + input;
                                     }
                             
                                     // Проверка формата даты
@@ -486,14 +484,14 @@ public class Main {
                                                     showError('Нужно 8 цифр! Формат: 1111-22-33');
                                                 }
                                             } else if (radioSscc.checked) {
-                                                // Для SSCC берем только первые 7 цифр на всякий случай
+                                                // Для SSCC берем только первые 8 цифр на всякий случай
                                                 let cleanText = input.replace(/\\D/g, '');
-                                                if (cleanText.length >= 7) {
-                                                    cleanText = cleanText.substring(0, 7);
+                                                if (cleanText.length >= 8) {
+                                                    cleanText = cleanText.substring(0, 8);
                                                     const result = processSscc(cleanText);
                                                     generateBarcodeImage(result);
                                                 } else {
-                                                    showError('Нужно 7 цифр!');
+                                                    showError('Нужно 8 цифр!');
                                                 }
                                             } else if (radioCustom.checked) {
                                                 // Для ШК - любые цифры
