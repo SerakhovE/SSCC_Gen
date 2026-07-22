@@ -3,9 +3,6 @@ package ru.example;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-import ru.example.bot.TelegramBot;
 
 import java.net.InetSocketAddress;
 import java.io.IOException;
@@ -15,11 +12,6 @@ import java.nio.charset.StandardCharsets;
 public class Main {
     public static void main(String[] args) {
         try {
-            // Запуск Telegram бота
-            TelegramBot bot = new TelegramBot();
-            TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(bot);
-
             // HTTP сервер для веб-интерфейса
             HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 
@@ -533,7 +525,7 @@ public class Main {
             });
 
             server.start();
-            System.out.println("✅ Бот запущен! Веб-интерфейс: https://sscc-gen.onrender.com");
+            System.out.println("✅ Веб-интерфейс запущен: https://sscc-gen.onrender.com");
 
         } catch (Exception e) {
             e.printStackTrace();
