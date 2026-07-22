@@ -11,8 +11,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.telegram:telegrambots:6.9.7.1'
-    implementation 'net.sf.barcode4j:barcode4j:2.1'
 }
 
 application {
