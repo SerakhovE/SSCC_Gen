@@ -280,7 +280,7 @@ public class Main {
                                     </div>
                             
                                     <div class="card input-card">
-                                        <input type="text" id="inputText" placeholder="Формат: 0000-00-00" maxlength="10">
+                                        <input type="text" id="inputText" inputmode="numeric" pattern="[0-9]*" placeholder="Формат: 0000-00-00" maxlength="10">
                                     </div>
                             
                                     <button id="generateButton">Сгенерировать</button>
